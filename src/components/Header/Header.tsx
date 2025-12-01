@@ -5,14 +5,25 @@ interface HeaderProps {
   onToggleTheme: () => void;
   onOpenGuide: () => void;
   onOpenSettings: () => void;
+  onOpenImport: () => void;
 }
 
-export function Header({ isDark, onToggleTheme, onOpenGuide, onOpenSettings }: HeaderProps) {
+export function Header({ isDark, onToggleTheme, onOpenGuide, onOpenSettings, onOpenImport }: HeaderProps) {
   return (
     <header className={styles.header}>
       <h1 className={styles.logo}>QuickReport</h1>
 
       <div className={styles.actions}>
+        <button
+          className={styles.button}
+          onClick={onOpenImport}
+          aria-label="데이터 불러오기"
+          data-testid="import-button"
+          data-tour="import"
+        >
+          불러오기
+        </button>
+
         <button
           className={styles.button}
           onClick={onOpenSettings}

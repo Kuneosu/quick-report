@@ -12,6 +12,7 @@ import { MobileTabBar } from './components/MobileTabBar';
 import { SettingsModal } from './components/SettingsModal';
 import { Sidebar } from './components/Sidebar';
 import { ProductTour, TOUR_STORAGE_KEY } from './components/ProductTour';
+import { ImportModal } from './components/ImportModal';
 import type { TabType } from './components/MobileTabBar';
 import { convertWithConfig } from './utils/markdownConverter';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -47,6 +48,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<TabType>('editor');
   const [currentDocumentId, setCurrentDocumentId] = useState<string | undefined>(undefined);
   const [isTourActive, setIsTourActive] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
 
   // 프리셋 관리
   const {
@@ -121,6 +123,34 @@ function App() {
   const handleCloseSettings = useCallback(() => {
     setIsSettingsOpen(false);
   }, []);
+
+  // Import 모달 열기
+  const handleOpenImport = useCallback(() => {
+    setIsImportOpen(true);
+  }, []);
+
+  // Import 모달 닫기
+  const handleCloseImport = useCallback(() => {
+    setIsImportOpen(false);
+  }, []);
+
+  // Import 내용 적용
+  const handleApplyImport = useCallback((text: string, mode: 'overwrite' | 'append' | 'prepend') => {
+    if (mode === 'overwrite') {
+      setMarkdown(text);
+      setSavedContent(text);
+    } else if (mode === 'append') {
+      const newContent = markdown.trim() ? markdown + '\n\n' + text : text;
+      setMarkdown(newContent);
+      setSavedContent(newContent);
+    } else if (mode === 'prepend') {
+      const newContent = markdown.trim() ? text + '\n\n' + markdown : text;
+      setMarkdown(newContent);
+      setSavedContent(newContent);
+    }
+    setSavedAt(new Date());
+    setToast({ message: '불러오기가 완료되었습니다', type: 'success' });
+  }, [markdown, setSavedContent]);
 
   // 새로 작성 다이얼로그 열기
   const handleOpenConfirm = useCallback(() => {
@@ -302,6 +332,7 @@ function App() {
         onToggleTheme={toggleTheme}
         onOpenGuide={handleOpenGuide}
         onOpenSettings={handleOpenSettings}
+        onOpenImport={handleOpenImport}
       />
 
       {isMobile && (
@@ -372,6 +403,13 @@ function App() {
         onResetToDefault={resetToDefault}
         onExportPreset={exportPreset}
         onImportPreset={importPreset}
+      />
+
+      <ImportModal
+        isOpen={isImportOpen}
+        onClose={handleCloseImport}
+        onApply={handleApplyImport}
+        hasExistingContent={!!markdown.trim()}
       />
 
       <ConfirmDialog

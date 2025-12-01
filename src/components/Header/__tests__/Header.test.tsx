@@ -9,6 +9,7 @@ describe('Header', () => {
     onToggleTheme: vi.fn(),
     onOpenGuide: vi.fn(),
     onOpenSettings: vi.fn(),
+    onOpenImport: vi.fn(),
   };
 
   describe('렌더링', () => {
@@ -73,6 +74,22 @@ describe('Header', () => {
 
       await user.click(screen.getByTestId('settings-button'));
       expect(handleOpenSettings).toHaveBeenCalled();
+    });
+  });
+
+  describe('불러오기 버튼', () => {
+    it('불러오기 버튼이 표시된다', () => {
+      render(<Header {...defaultProps} />);
+      expect(screen.getByTestId('import-button')).toBeInTheDocument();
+    });
+
+    it('불러오기 버튼 클릭 시 onOpenImport 호출', async () => {
+      const user = userEvent.setup();
+      const handleOpenImport = vi.fn();
+      render(<Header {...defaultProps} onOpenImport={handleOpenImport} />);
+
+      await user.click(screen.getByTestId('import-button'));
+      expect(handleOpenImport).toHaveBeenCalled();
     });
   });
 
