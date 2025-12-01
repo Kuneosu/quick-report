@@ -32,34 +32,12 @@ describe('useImportConvert', () => {
     });
   });
 
-  describe('▶/-/+/. 형식 파싱', () => {
+  describe('▶/-/+ 형식 파싱 (정확한 들여쓰기)', () => {
     it('기본 형식을 올바르게 파싱한다', async () => {
       const { result } = renderHook(() => useImportConvert());
 
       const input = `▶ 프로젝트A
   - 활동1
-    + 작업1
-      . 세부1`;
-
-      act(() => {
-        result.current.setInputText(input);
-      });
-
-      await act(async () => {
-        result.current.convert();
-        await new Promise((r) => setTimeout(r, 10));
-      });
-
-      expect(result.current.convertedText).toContain('# 프로젝트A');
-      expect(result.current.convertedText).toContain('## 활동1');
-      expect(result.current.convertedText).toContain('### 작업1');
-      expect(result.current.convertedText).toContain('#### 세부1');
-    });
-
-    it('프로젝트-활동 복합 형식을 파싱한다', async () => {
-      const { result } = renderHook(() => useImportConvert());
-
-      const input = `▶ 프로젝트A - 활동1
     + 작업1`;
 
       act(() => {
@@ -75,16 +53,52 @@ describe('useImportConvert', () => {
       expect(result.current.convertedText).toContain('## 활동1');
       expect(result.current.convertedText).toContain('### 작업1');
     });
+
+    it('정확히 2칸 들여쓰기 + - 를 활동으로 인식한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `▶ 프로젝트
+  - 활동 (2칸 들여쓰기)`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      expect(result.current.convertedText).toContain('## 활동 (2칸 들여쓰기)');
+    });
+
+    it('정확히 4칸 들여쓰기 + + 를 작업으로 인식한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `▶ 프로젝트
+  - 활동
+    + 작업 (4칸 들여쓰기)`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      expect(result.current.convertedText).toContain('### 작업 (4칸 들여쓰기)');
+    });
   });
 
-  describe('#/##/###/#### 형식 파싱', () => {
+  describe('#/##/### 형식 파싱', () => {
     it('마크다운 형식을 올바르게 파싱한다', async () => {
       const { result } = renderHook(() => useImportConvert());
 
       const input = `# 프로젝트B
 ## 활동2
-### 작업2
-#### 세부2`;
+### 작업2`;
 
       act(() => {
         result.current.setInputText(input);
@@ -98,7 +112,73 @@ describe('useImportConvert', () => {
       expect(result.current.convertedText).toContain('# 프로젝트B');
       expect(result.current.convertedText).toContain('## 활동2');
       expect(result.current.convertedText).toContain('### 작업2');
-      expect(result.current.convertedText).toContain('#### 세부2');
+    });
+  });
+
+  describe('따옴표 제거 (전처리)', () => {
+    it('줄 시작/끝의 따옴표를 제거한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `"▶ 프로젝트
+  - 활동
+    + 작업"`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      expect(result.current.convertedText).toContain('# 프로젝트');
+      expect(result.current.convertedText).not.toContain('"');
+    });
+
+    it('여러 날 보고서 구분자 따옴표를 제거한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `"▶ 프로젝트
+  - 활동1
+    + 작업1
+"    "▶ 프로젝트
+  - 활동2
+    + 작업2"`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      // 프로젝트가 그룹핑되어 한 번만 나타나야 함
+      const matches = result.current.convertedText.match(/# 프로젝트/g);
+      expect(matches).toHaveLength(1);
+      expect(result.current.convertedText).toContain('## 활동1');
+      expect(result.current.convertedText).toContain('## 활동2');
+    });
+
+    it('이스케이프된 따옴표("")를 단일 따옴표로 복원한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `▶ 프로젝트
+  - 개발
+    + 기획전 리스트 ""유형"" 컬럼 추가`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      expect(result.current.convertedText).toContain('### 기획전 리스트 "유형" 컬럼 추가');
     });
   });
 
@@ -158,14 +238,13 @@ describe('useImportConvert', () => {
   });
 
   describe('중복 제거', () => {
-    it('동일한 세부내용 중복을 제거한다', async () => {
+    it('동일한 작업 중복을 제거한다', async () => {
       const { result } = renderHook(() => useImportConvert());
 
       const input = `# 프로젝트A
 ## 활동1
-### 작업1
-#### 동일세부
-#### 동일세부`;
+### 동일작업
+### 동일작업`;
 
       act(() => {
         result.current.setInputText(input);
@@ -179,8 +258,8 @@ describe('useImportConvert', () => {
       // 중복제거 통계가 증가해야 함
       expect(result.current.stats.duplicatesRemoved).toBe(1);
 
-      // 동일세부가 한 번만 나타나야 함
-      const matches = result.current.convertedText.match(/#### 동일세부/g);
+      // 동일작업이 한 번만 나타나야 함
+      const matches = result.current.convertedText.match(/### 동일작업/g);
       expect(matches).toHaveLength(1);
     });
   });
@@ -226,6 +305,70 @@ describe('useImportConvert', () => {
       });
 
       expect(result.current.stats.totalLines).toBe(3);
+    });
+  });
+
+  describe('실제 입력 케이스 (task 예시)', () => {
+    it('여러 날 보고서 데이터를 올바르게 변환한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `"▶ 꿀스테이
+  - 검토
+    + 기획전 고도화 UID 및 개발건 검토
+
+  - 개발
+    + 기획전 리스트 ""유형"" 컬럼 추가
+    + 기획전 패키지 등록 버튼 추가
+"    "▶ 꿀스테이
+  - 회의
+    + 일시 : 25.11.25 (화) 10:30 ~ 11:30 / 14:00 ~ 15:00
+    + 내용 : 주간회의
+
+  - 검토
+    + 기획전 고도화 UID 및 개발건 검토
+
+  - 개발
+    + 기획전의 게시글 등록/수정 팝업 신규 헤더 추가
+
+▶ 스터디
+  - PMS 고도화 검토"`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      // 꿀스테이가 한 번만 나타나야 함 (그룹핑)
+      const projectMatches = result.current.convertedText.match(/# 꿀스테이/g);
+      expect(projectMatches).toHaveLength(1);
+
+      // 검토가 한 번만 나타나야 함 (그룹핑)
+      const reviewMatches = result.current.convertedText.match(/## 검토/g);
+      expect(reviewMatches).toHaveLength(1);
+
+      // 개발이 한 번만 나타나야 함 (그룹핑)
+      const devMatches = result.current.convertedText.match(/## 개발/g);
+      expect(devMatches).toHaveLength(1);
+
+      // 중복 작업이 한 번만 나타나야 함
+      const dupTaskMatches = result.current.convertedText.match(/### 기획전 고도화 UID 및 개발건 검토/g);
+      expect(dupTaskMatches).toHaveLength(1);
+
+      // 이스케이프된 따옴표가 복원되어야 함
+      expect(result.current.convertedText).toContain('### 기획전 리스트 "유형" 컬럼 추가');
+
+      // 스터디 프로젝트가 있어야 함
+      expect(result.current.convertedText).toContain('# 스터디');
+
+      // 프로젝트 수 확인
+      expect(result.current.stats.projects).toBe(2);
+
+      // 중복 제거 확인 (검토 작업 중복)
+      expect(result.current.stats.duplicatesRemoved).toBe(1);
     });
   });
 
@@ -287,6 +430,31 @@ describe('useImportConvert', () => {
       });
 
       expect(result.current.convertedText).toBe('');
+    });
+  });
+
+  describe('인식되지 않는 형식 무시', () => {
+    it('인식되지 않는 라인은 무시한다 (기타로 분류하지 않음)', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `# 프로젝트
+## 활동
+### 작업
+인식되지 않는 라인
+다른 형식의 텍스트`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      // "기타" 프로젝트가 없어야 함
+      expect(result.current.convertedText).not.toContain('# 기타');
+      expect(result.current.convertedText).not.toContain('인식되지 않는 라인');
     });
   });
 });
