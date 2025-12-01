@@ -19,10 +19,11 @@ export interface ConversionResult {
   errors: ConversionError[];
 }
 
-// 단순화된 데이터 구조 (Level 3까지만 사용)
+// 데이터 구조 (Level 4까지 지원)
+// project -> activity -> task -> details
 interface ParsedData {
   [project: string]: {
-    [activity: string]: Set<string>;
+    [activity: string]: Map<string, Set<string>>;
   };
 }
 
@@ -59,6 +60,7 @@ function parseAndGroup(input: string): { data: ParsedData; counter: GroupingCoun
 
   let currentProject = '';
   let currentActivity = '';
+  let currentTask = '';
 
   for (let i = 0; i < lines.length; i++) {
     const rawLine = lines[i];
@@ -70,6 +72,7 @@ function parseAndGroup(input: string): { data: ParsedData; counter: GroupingCoun
       const withoutMarker = trimmed.replace(/^#\s*/, '').replace(/^▶\s*/, '').trim();
       currentProject = withoutMarker;
       currentActivity = '';
+      currentTask = '';
 
       // 기존 프로젝트 그룹핑 카운트
       if (data[currentProject]) {
@@ -90,12 +93,13 @@ function parseAndGroup(input: string): { data: ParsedData; counter: GroupingCoun
         : level2MarkdownMatch![1].trim();
 
       currentActivity = activityText;
+      currentTask = '';
 
       if (currentProject) {
         if (data[currentProject][currentActivity]) {
           counter.groupings++;
         } else {
-          data[currentProject][currentActivity] = new Set();
+          data[currentProject][currentActivity] = new Map();
         }
       }
       continue;
@@ -110,12 +114,37 @@ function parseAndGroup(input: string): { data: ParsedData; counter: GroupingCoun
         ? level3SymbolMatch[1].trim()
         : level3MarkdownMatch![1].trim();
 
+      currentTask = taskText;
+
       if (currentProject && currentActivity) {
-        const activitySet = data[currentProject][currentActivity];
-        if (activitySet.has(taskText)) {
+        const activityMap = data[currentProject][currentActivity];
+        if (activityMap.has(taskText)) {
           counter.duplicates++;
         } else {
-          activitySet.add(taskText);
+          activityMap.set(taskText, new Set());
+        }
+      }
+      continue;
+    }
+
+    // Level 4: #### 세부내용 또는 정확히 6칸 들여쓰기 + . 세부내용
+    const level4SymbolMatch = rawLine.match(/^      \. (.+)$/);
+    const level4MarkdownMatch = trimmed.match(/^#### (.+)$/);
+
+    if (level4SymbolMatch || level4MarkdownMatch) {
+      const detailText = level4SymbolMatch
+        ? level4SymbolMatch[1].trim()
+        : level4MarkdownMatch![1].trim();
+
+      if (currentProject && currentActivity && currentTask) {
+        const activityMap = data[currentProject][currentActivity];
+        const detailSet = activityMap.get(currentTask);
+        if (detailSet) {
+          if (detailSet.has(detailText)) {
+            counter.duplicates++;
+          } else {
+            detailSet.add(detailText);
+          }
         }
       }
       continue;
@@ -144,7 +173,7 @@ function formatOutput(data: ParsedData): string {
     lines.push(`# ${project}`);
 
     let isFirstActivity = true;
-    for (const [activity, tasks] of Object.entries(activities)) {
+    for (const [activity, tasksMap] of Object.entries(activities)) {
       // 활동 사이에 빈 줄 추가 (첫 번째 제외)
       if (!isFirstActivity) {
         lines.push('');
@@ -153,9 +182,13 @@ function formatOutput(data: ParsedData): string {
 
       lines.push(`## ${activity}`);
 
-      // 작업이 있는 경우만 출력
-      for (const task of tasks) {
+      // 작업과 세부내용 출력
+      for (const [task, details] of tasksMap.entries()) {
         lines.push(`### ${task}`);
+        // Level 4 세부내용 출력
+        for (const detail of details) {
+          lines.push(`#### ${detail}`);
+        }
       }
     }
   }

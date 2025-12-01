@@ -115,6 +115,79 @@ describe('useImportConvert', () => {
     });
   });
 
+  describe('Level 4 (세부내용) 파싱', () => {
+    it('6칸 들여쓰기 + . 를 세부내용으로 인식한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `▶ 스터디
+  - Multi Agent System 구축
+    + 결과물 퀄리티 테스트용 프로젝트 구현
+      . 핵심 기능 구현 완료
+      . 부가 기능 구현`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      expect(result.current.convertedText).toContain('# 스터디');
+      expect(result.current.convertedText).toContain('## Multi Agent System 구축');
+      expect(result.current.convertedText).toContain('### 결과물 퀄리티 테스트용 프로젝트 구현');
+      expect(result.current.convertedText).toContain('#### 핵심 기능 구현 완료');
+      expect(result.current.convertedText).toContain('#### 부가 기능 구현');
+    });
+
+    it('마크다운 #### 형식도 세부내용으로 인식한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `# 프로젝트
+## 활동
+### 작업
+#### 세부내용1
+#### 세부내용2`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      expect(result.current.convertedText).toContain('#### 세부내용1');
+      expect(result.current.convertedText).toContain('#### 세부내용2');
+    });
+
+    it('중복된 세부내용은 제거한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      const input = `▶ 프로젝트
+  - 활동
+    + 작업
+      . 동일세부
+      . 동일세부`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      // 중복 제거되어 한 번만 나타나야 함
+      const matches = result.current.convertedText.match(/#### 동일세부/g);
+      expect(matches).toHaveLength(1);
+      expect(result.current.stats.duplicatesRemoved).toBe(1);
+    });
+  });
+
   describe('따옴표 제거 (전처리)', () => {
     it('줄 시작/끝의 따옴표를 제거한다', async () => {
       const { result } = renderHook(() => useImportConvert());
