@@ -97,9 +97,9 @@ describe('ProductTour', () => {
       expect(screen.getByText(TOUR_STEPS[0].description)).toBeInTheDocument();
     });
 
-    it('진행 상태가 표시된다 (1/6)', () => {
+    it('진행 상태가 표시된다 (1/7)', () => {
       render(<ProductTour isActive={true} onComplete={() => {}} onSkip={() => {}} />);
-      expect(screen.getByText(/1.*6/)).toBeInTheDocument();
+      expect(screen.getByText(/1.*7/)).toBeInTheDocument();
     });
   });
 
@@ -289,8 +289,8 @@ describe('ProductTour', () => {
 });
 
 describe('tourSteps', () => {
-  it('6개의 스텝이 정의되어 있다', () => {
-    expect(TOUR_STEPS).toHaveLength(6);
+  it('7개의 스텝이 정의되어 있다', () => {
+    expect(TOUR_STEPS).toHaveLength(7);
   });
 
   it('각 스텝에 필수 필드가 있다', () => {
@@ -303,12 +303,13 @@ describe('tourSteps', () => {
     });
   });
 
-  it('스텝 순서: 에디터 → 미리보기 → 복사 → 사이드바 → 설정 → 가이드', () => {
+  it('스텝 순서: 에디터 → 미리보기 → 복사 → 사이드바 → 불러오기 → 설정 → 가이드', () => {
     expect(TOUR_STEPS[0].id).toBe('editor');
     expect(TOUR_STEPS[1].id).toBe('preview');
     expect(TOUR_STEPS[2].id).toBe('copy');
     expect(TOUR_STEPS[3].id).toBe('sidebar');
-    expect(TOUR_STEPS[4].id).toBe('settings');
-    expect(TOUR_STEPS[5].id).toBe('guide');
+    expect(TOUR_STEPS[4].id).toBe('import');
+    expect(TOUR_STEPS[5].id).toBe('settings');
+    expect(TOUR_STEPS[6].id).toBe('guide');
   });
 });

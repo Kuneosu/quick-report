@@ -46,6 +46,13 @@ export const TOUR_STEPS: TourStep[] = [
     mobileAction: 'open-sidebar',
   },
   {
+    id: 'import',
+    target: '[data-tour="import"], [data-testid="import-button"]',
+    title: '데이터 불러오기',
+    description: '기존 보고서 데이터를 불러와 자동으로 그룹핑하고 중복을 제거합니다. 여러 날의 보고서를 한 번에 병합할 수 있습니다.',
+    position: 'bottom-left',
+  },
+  {
     id: 'settings',
     target: '[data-tour="settings"], [data-testid="settings-button"]',
     title: '변환 설정',
@@ -61,6 +68,6 @@ export const TOUR_STEPS: TourStep[] = [
   },
 ];
 
-export const TOUR_VERSION = '1.0.0';
+export const TOUR_VERSION = '1.1.0';
 export const TOUR_STORAGE_KEY = 'quickreport-tour-shown';
 export const TOUR_VERSION_KEY = 'quickreport-tour-version';
