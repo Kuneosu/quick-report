@@ -1,0 +1,307 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: fadeIn var(--transition-fast) ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn var(--transition-normal) ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+  font-size: var(--font-size-large);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.closeButton:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.content {
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.presetSelector {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
+.presetButton {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-small);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.presetButton:hover {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-accent);
+}
+
+.presetButton.active {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.presetButton.deletable {
+  position: relative;
+  padding-right: calc(var(--spacing-md) + 20px);
+}
+
+.deleteIcon {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-primary);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.presetButton:hover .deleteIcon {
+  opacity: 1;
+  color: var(--color-error);
+}
+
+.levelConfig {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.levelRow {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr 100px;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.levelLabel {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-small);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.preview {
+  font-family: var(--font-editor);
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  white-space: pre;
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.actionButton {
+  flex: 1;
+  padding: var(--spacing-sm);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-small);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.actionButton:hover {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-accent);
+}
+
+.actionButton.primary {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.actionButton.primary:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+  gap: var(--spacing-sm);
+}
+
+.footerButton {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.footerButton.secondary {
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-secondary);
+}
+
+.footerButton.secondary:hover {
+  background-color: var(--color-bg-primary);
+}
+
+.footerButton.primary {
+  color: white;
+  background-color: var(--color-accent);
+}
+
+.footerButton.primary:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.footerButton:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.saveDialog {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.saveInput {
+  flex: 1;
+  padding: var(--spacing-sm);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-small);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.saveInput:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .levelRow {
+    grid-template-columns: 50px 1fr 80px;
+  }
+
+  .preview {
+    display: none;
+  }
+}

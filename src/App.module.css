@@ -1,0 +1,92 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editorSection,
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+.previewSection {
+  position: relative;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--spacing-sm) 0;
+  flex-shrink: 0;
+}
+
+/* 복사 버튼 래퍼 - 미리보기 우상단 절대 위치 */
+.copyButtonWrapper {
+  position: absolute;
+  top: var(--spacing-lg);
+  right: var(--spacing-sm);
+  z-index: 10;
+}
+
+.toastContainer {
+  position: fixed;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 1000;
+}
+
+/* Mobile layout */
+.main.mobile {
+  display: flex;
+  flex-direction: column;
+}
+
+.main.mobile .editorSection,
+.main.mobile .previewSection {
+  flex: 1;
+}
+
+.main.mobile .copyButtonWrapper {
+  top: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main:not(.mobile) {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .toastContainer {
+    top: var(--spacing-md);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}

@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.textarea {
+  flex: 1;
+  width: 100%;
+  padding: var(--spacing-md);
+  font-family: var(--font-editor);
+  font-size: var(--font-size-editor);
+  line-height: var(--line-height-editor);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-editor);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  resize: none;
+  transition: border-color var(--transition-fast);
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.textarea::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}

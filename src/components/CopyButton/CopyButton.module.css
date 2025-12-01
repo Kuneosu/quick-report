@@ -1,0 +1,43 @@
+/* 아이콘 전용 버튼 스타일 */
+.iconButton {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.iconButton:hover:not(:disabled) {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+.iconButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.iconButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.iconButton:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.iconButton.copied {
+  color: var(--color-success);
+}
+
+.iconButton.copied:hover {
+  color: var(--color-success);
+}
