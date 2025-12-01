@@ -180,6 +180,31 @@ describe('useImportConvert', () => {
 
       expect(result.current.convertedText).toContain('### 기획전 리스트 "유형" 컬럼 추가');
     });
+
+    it('▶ 앞에 줄바꿈이 없으면 줄바꿈을 추가한다', async () => {
+      const { result } = renderHook(() => useImportConvert());
+
+      // 따옴표 제거 후 ▶ 앞에 줄바꿈이 사라지는 케이스
+      const input = `"▶ 스터디
+  - PMS 고도화 검토"    "▶ 꿀스테이
+  - 회의"`;
+
+      act(() => {
+        result.current.setInputText(input);
+      });
+
+      await act(async () => {
+        result.current.convert();
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      // 스터디와 꿀스테이가 별도 프로젝트로 분리되어야 함
+      expect(result.current.convertedText).toContain('# 스터디');
+      expect(result.current.convertedText).toContain('## PMS 고도화 검토');
+      expect(result.current.convertedText).toContain('# 꿀스테이');
+      expect(result.current.convertedText).toContain('## 회의');
+      expect(result.current.stats.projects).toBe(2);
+    });
   });
 
   describe('그룹핑', () => {

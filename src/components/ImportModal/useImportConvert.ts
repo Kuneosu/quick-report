@@ -31,12 +31,13 @@ interface GroupingCounter {
   duplicates: number;
 }
 
-// 전처리: 따옴표 제거
+// 전처리: 따옴표 제거 및 줄바꿈 정규화
 function preprocessInput(input: string): string {
   // 처리 순서가 중요:
   // 1. 먼저 이스케이프된 따옴표("")를 임시 플레이스홀더로 변환
   // 2. 구분자 따옴표 제거
   // 3. 플레이스홀더를 단일 따옴표로 복원
+  // 4. ▶ 앞에 줄바꿈이 없으면 추가
   const PLACEHOLDER = '\u0000QUOTE\u0000';
 
   return input
@@ -44,7 +45,8 @@ function preprocessInput(input: string): string {
     .replace(/"\s*"/g, '') // 줄 사이 구분자 따옴표 제거
     .replace(/^"/gm, '') // 줄 시작 따옴표 제거
     .replace(/"$/gm, '') // 줄 끝 따옴표 제거
-    .replace(new RegExp(PLACEHOLDER, 'g'), '"'); // 플레이스홀더를 단일 따옴표로 복원
+    .replace(new RegExp(PLACEHOLDER, 'g'), '"') // 플레이스홀더를 단일 따옴표로 복원
+    .replace(/([^\n])▶/g, '$1\n▶'); // ▶ 앞에 줄바꿈이 없으면 추가
 }
 
 function parseAndGroup(input: string): { data: ParsedData; counter: GroupingCounter; errors: ConversionError[] } {
