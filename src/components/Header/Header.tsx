@@ -10,7 +10,7 @@ interface HeaderProps {
 export function Header({ isDark, onToggleTheme, onOpenGuide, onOpenSettings }: HeaderProps) {
   return (
     <header className={styles.header}>
-      <h1 className={styles.logo}>MD → Report</h1>
+      <h1 className={styles.logo}>QuickReport</h1>
 
       <div className={styles.actions}>
         <button
@@ -18,6 +18,7 @@ export function Header({ isDark, onToggleTheme, onOpenGuide, onOpenSettings }: H
           onClick={onOpenSettings}
           aria-label="형식 설정 열기"
           data-testid="settings-button"
+          data-tour="settings"
         >
           설정
         </button>
@@ -26,8 +27,10 @@ export function Header({ isDark, onToggleTheme, onOpenGuide, onOpenSettings }: H
           className={styles.button}
           onClick={onOpenGuide}
           aria-label="문법 가이드 열기"
+          data-testid="guide-button"
+          data-tour="guide"
         >
-          ? 가이드
+          가이드
         </button>
 
         <button

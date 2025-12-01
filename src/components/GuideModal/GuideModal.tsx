@@ -4,6 +4,7 @@ import styles from './GuideModal.module.css';
 interface GuideModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onStartTour?: () => void;
 }
 
 const GUIDE_ITEMS = [
@@ -13,7 +14,7 @@ const GUIDE_ITEMS = [
   { syntax: '#### 하위', result: '      . 하위 세부사항', description: '6칸 들여쓰기' },
 ];
 
-export function GuideModal({ isOpen, onClose }: GuideModalProps) {
+export function GuideModal({ isOpen, onClose, onStartTour }: GuideModalProps) {
   // ESC 키 핸들러
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -96,6 +97,11 @@ export function GuideModal({ isOpen, onClose }: GuideModalProps) {
         </div>
 
         <footer className={styles.footer}>
+          {onStartTour && (
+            <button className={styles.tourButton} onClick={onStartTour}>
+              가이드 다시 보기
+            </button>
+          )}
           <button className={styles.confirmButton} onClick={onClose}>
             확인
           </button>

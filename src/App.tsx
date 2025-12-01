@@ -11,6 +11,7 @@ import { NameInputDialog } from './components/NameInputDialog';
 import { MobileTabBar } from './components/MobileTabBar';
 import { SettingsModal } from './components/SettingsModal';
 import { Sidebar } from './components/Sidebar';
+import { ProductTour, TOUR_STORAGE_KEY } from './components/ProductTour';
 import type { TabType } from './components/MobileTabBar';
 import { convertWithConfig } from './utils/markdownConverter';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -45,6 +46,7 @@ function App() {
   const [isNameDialogOpen, setIsNameDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('editor');
   const [currentDocumentId, setCurrentDocumentId] = useState<string | undefined>(undefined);
+  const [isTourActive, setIsTourActive] = useState(false);
 
   // 프리셋 관리
   const {
@@ -262,6 +264,37 @@ function App() {
   const showEditor = !isMobile || activeTab === 'editor';
   const showPreview = !isMobile || activeTab === 'preview';
 
+  // 첫 방문 시 투어 자동 시작
+  useEffect(() => {
+    const completed = localStorage.getItem(TOUR_STORAGE_KEY);
+    if (!completed) {
+      const timer = setTimeout(() => {
+        setIsTourActive(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // 투어 시작 (가이드 모달에서)
+  const handleStartTour = useCallback(() => {
+    setIsGuideOpen(false);
+    setIsTourActive(true);
+  }, []);
+
+  // 투어 완료
+  const handleTourComplete = useCallback(() => {
+    setIsTourActive(false);
+    localStorage.setItem(TOUR_STORAGE_KEY, 'true');
+    setToast({ message: '투어를 완료했습니다! 언제든 가이드에서 다시 볼 수 있어요.', type: 'success' });
+  }, []);
+
+  // 투어 건너뛰기
+  const handleTourSkip = useCallback(() => {
+    setIsTourActive(false);
+    localStorage.setItem(TOUR_STORAGE_KEY, 'true');
+    setToast({ message: '언제든 가이드에서 투어를 다시 시작할 수 있어요.', type: 'info' });
+  }, []);
+
   return (
     <div className={styles.app}>
       <Header
@@ -325,7 +358,7 @@ function App() {
 
       <Footer savedAt={savedAt} onClear={handleOpenConfirm} />
 
-      <GuideModal isOpen={isGuideOpen} onClose={handleCloseGuide} />
+      <GuideModal isOpen={isGuideOpen} onClose={handleCloseGuide} onStartTour={handleStartTour} />
 
       <SettingsModal
         isOpen={isSettingsOpen}
@@ -379,6 +412,12 @@ function App() {
           />
         </div>
       )}
+
+      <ProductTour
+        isActive={isTourActive}
+        onComplete={handleTourComplete}
+        onSkip={handleTourSkip}
+      />
     </div>
   );
 }

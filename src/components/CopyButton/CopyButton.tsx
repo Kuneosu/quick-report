@@ -36,6 +36,8 @@ export function CopyButton({ text, onCopySuccess, onCopyError, disabled }: CopyB
       disabled={disabled}
       title={copied ? '복사 완료' : '복사'}
       aria-label={copied ? '복사 완료' : '결과 복사'}
+      data-tour="copy"
+      data-testid="copy-button"
     >
       {copied ? '✓' : '⎘'}
     </button>

@@ -14,7 +14,7 @@ describe('Header', () => {
   describe('렌더링', () => {
     it('로고가 표시된다', () => {
       render(<Header {...defaultProps} />);
-      expect(screen.getByText(/MD.*Report/i)).toBeInTheDocument();
+      expect(screen.getByText('QuickReport')).toBeInTheDocument();
     });
 
     it('가이드 버튼이 표시된다', () => {

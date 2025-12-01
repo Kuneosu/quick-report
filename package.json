@@ -1,8 +1,8 @@
 {
-  "name": "md-to-report",
+  "name": "quickreport",
   "private": true,
   "version": "1.0.0",
-  "description": "마크다운 → 업무보고 형식 변환기",
+  "description": "QuickReport - 마크다운을 업무보고 형식으로 빠르게 변환",
   "type": "module",
   "scripts": {
     "dev": "vite",
