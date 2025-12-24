@@ -1,5 +1,5 @@
-import { useCallback, useRef } from 'react';
-import styles from './Editor.module.css';
+import { useCallback, useRef, useLayoutEffect } from "react";
+import styles from "./Editor.module.css";
 
 interface EditorProps {
   value: string;
@@ -23,23 +23,41 @@ const PLACEHOLDER = `# 프로젝트명을 입력하세요
 팁: /1, /2, /3, /4 + Space로 빠르게 헤딩 입력`;
 
 const SLASH_SHORTCUTS: Record<string, string> = {
-  '/1 ': '# ',
-  '/2 ': '## ',
-  '/3 ': '### ',
-  '/4 ': '#### ',
+  "/1 ": "# ",
+  "/2 ": "## ",
+  "/3 ": "### ",
+  "/4 ": "#### ",
 };
 
 export function Editor({ value, onChange }: EditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const pendingCursorRef = useRef<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (pendingCursorRef.current !== null && textareaRef.current) {
+      textareaRef.current.selectionStart = pendingCursorRef.current;
+      textareaRef.current.selectionEnd = pendingCursorRef.current;
+      pendingCursorRef.current = null;
+    }
+  }, [value]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       let newValue = e.target.value;
+      const cursorPos = e.target.selectionStart;
 
-      // 슬래시 단축키 변환
+      // 커서 앞쪽 텍스트 추출
+      const textBeforeCursor = newValue.slice(0, cursorPos);
+
+      // 커서 위치 기준으로 슬래시 단축키 변환
       for (const [shortcut, replacement] of Object.entries(SLASH_SHORTCUTS)) {
-        if (newValue.endsWith(shortcut)) {
-          newValue = newValue.slice(0, -shortcut.length) + replacement;
+        if (textBeforeCursor.endsWith(shortcut)) {
+          const before = textBeforeCursor.slice(0, -shortcut.length);
+          const after = newValue.slice(cursorPos);
+
+          newValue = before + replacement + after;
+          const lengthDiff = replacement.length - shortcut.length;
+          pendingCursorRef.current = cursorPos + lengthDiff;
           break;
         }
       }
