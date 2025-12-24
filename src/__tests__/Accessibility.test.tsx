@@ -95,7 +95,7 @@ describe('접근성', () => {
       await user.type(editor, '# 테스트');
 
       // 복사 버튼 클릭
-      const copyButton = screen.getByRole('button', { name: /복사/i });
+      const copyButton = screen.getByRole('button', { name: '결과 복사' });
       await user.click(copyButton);
 
       // 토스트에 role="alert" 확인

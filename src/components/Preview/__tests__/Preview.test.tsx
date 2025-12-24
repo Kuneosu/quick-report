@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Preview } from '../Preview';
+import * as useClipboardHook from '../../../hooks/useClipboard';
 
 describe('Preview', () => {
   describe('렌더링', () => {
@@ -38,6 +39,37 @@ describe('Preview', () => {
     it('data-testid가 설정되어 있다', () => {
       render(<Preview content="테스트" />);
       expect(screen.getByTestId('preview')).toBeInTheDocument();
+    });
+  });
+
+  describe('인터랙션', () => {
+    beforeEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('섹션을 클릭하면 클립보드에 복사된다', async () => {
+      const copyMock = vi.fn().mockResolvedValue(true);
+      vi.spyOn(useClipboardHook, 'useClipboard').mockReturnValue({
+        copy: copyMock,
+        supported: true,
+      });
+
+      const user = (await import('@testing-library/user-event')).default.setup();
+      const content = '▶ 섹션 1\n내용 1\n▶ 섹션 2\n내용 2';
+      const onCopySuccess = vi.fn();
+      
+      render(<Preview content={content} onCopySuccess={onCopySuccess} />);
+      
+      const sections = screen.getAllByRole('button');
+      
+      // 첫 번째 섹션 클릭
+      await user.click(sections[0]);
+      expect(copyMock).toHaveBeenCalledWith('▶ 섹션 1\n내용 1');
+      expect(onCopySuccess).toHaveBeenCalled();
+      
+      // 두 번째 섹션 클릭
+      await user.click(sections[1]);
+      expect(copyMock).toHaveBeenCalledWith('▶ 섹션 2\n내용 2');
     });
   });
 });

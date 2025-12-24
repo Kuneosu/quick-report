@@ -20,6 +20,19 @@
   word-break: break-word;
 }
 
+.section {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.section:hover {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border);
+  cursor: pointer;
+}
+
 .placeholder {
   color: var(--color-text-secondary);
   font-style: italic;

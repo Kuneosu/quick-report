@@ -381,7 +381,10 @@ function App() {
                   disabled={!convertedContent.trim()}
                 />
               </div>
-              <Preview content={convertedContent} />
+              <Preview 
+                content={convertedContent} 
+                onCopySuccess={handleCopySuccess}
+              />
             </section>
           )}
         </main>
